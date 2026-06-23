@@ -19,7 +19,6 @@ fun SpaceSetupScreen(
     val uiState by viewModel.uiState.collectAsState()
     val mySpace by viewModel.mySpace.collectAsState()
 
-    // Guard against calling onSpaceReady() twice (from observer + Continue button)
     val hasNavigated = remember { mutableStateOf(false) }
     fun navigate() { if (!hasNavigated.value) { hasNavigated.value = true; onSpaceReady() } }
 
@@ -40,9 +39,9 @@ fun SpaceSetupScreen(
         verticalArrangement = Arrangement.spacedBy(20.dp),
     ) {
         Spacer(Modifier.height(32.dp))
-        Text("Set up your space", style = MaterialTheme.typography.headlineMedium)
+        Text("Ваше пространство", style = MaterialTheme.typography.headlineMedium)
         Text(
-            "Create a private space and share the invite code with your partner.",
+            "Создайте личное пространство и поделитесь кодом приглашения с партнёром.",
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -51,49 +50,46 @@ fun SpaceSetupScreen(
         OutlinedTextField(
             value = displayName,
             onValueChange = { displayName = it },
-            label = { Text("Your name") },
+            label = { Text("Ваше имя") },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
         )
 
         TabRow(selectedTabIndex = tab) {
             Tab(selected = tab == 0, onClick = { tab = 0; viewModel.resetState() },
-                text = { Text("Create space") })
+                text = { Text("Создать") })
             Tab(selected = tab == 1, onClick = { tab = 1; viewModel.resetState() },
-                text = { Text("Join space") })
+                text = { Text("Вступить") })
         }
 
         if (tab == 0) {
-            // Create
             Button(
-                onClick = { viewModel.createSpace(displayName.ifBlank { "Partner" }) },
+                onClick = { viewModel.createSpace(displayName.ifBlank { "Партнёр" }) },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !isLoading && displayName.isNotBlank(),
             ) {
                 if (isLoading) CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp)
-                else Text("Create a new space")
+                else Text("Создать пространство")
             }
         } else {
-            // Join
             OutlinedTextField(
                 value = inviteCode,
                 onValueChange = { inviteCode = it.uppercase().take(6) },
-                label = { Text("Invite code (6 characters)") },
+                label = { Text("Код приглашения (6 символов)") },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Characters),
                 modifier = Modifier.fillMaxWidth(),
             )
             Button(
-                onClick = { viewModel.joinSpace(inviteCode, displayName.ifBlank { "Partner" }) },
+                onClick = { viewModel.joinSpace(inviteCode, displayName.ifBlank { "Партнёр" }) },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !isLoading && displayName.isNotBlank() && inviteCode.length == 6,
             ) {
                 if (isLoading) CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp)
-                else Text("Join space")
+                else Text("Вступить в пространство")
             }
         }
 
-        // Show invite code after creation
         val createdSpace = (uiState as? SpaceUiState.Success)?.space
         if (createdSpace != null) {
             Spacer(Modifier.height(8.dp))
@@ -103,14 +99,14 @@ fun SpaceSetupScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    Text("Space created! 🎉", style = MaterialTheme.typography.titleMedium)
-                    Text("Share this code with your partner:", style = MaterialTheme.typography.bodySmall)
+                    Text("Пространство создано! 🎉", style = MaterialTheme.typography.titleMedium)
+                    Text("Поделитесь этим кодом с партнёром:", style = MaterialTheme.typography.bodySmall)
                     Text(
                         createdSpace.inviteCode,
                         style = MaterialTheme.typography.displaySmall,
                         color = MaterialTheme.colorScheme.primary,
                     )
-                    OutlinedButton(onClick = { navigate() }) { Text("Continue") }
+                    OutlinedButton(onClick = { navigate() }) { Text("Продолжить") }
                 }
             }
         }

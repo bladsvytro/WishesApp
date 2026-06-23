@@ -72,7 +72,7 @@ class WishRepository @Inject constructor(
         val uid = auth.currentUser?.uid ?: error("Not authenticated")
         val space = spaceRepository.getMySpace() ?: error("Not in a space")
         val userDoc = firestore.collection("users").document(uid).get().await()
-        val displayName = userDoc.getString("displayName") ?: "Partner"
+        val displayName = userDoc.getString("displayName") ?: "Партнёр"
 
         var imageSmall: String? = null
         var imageFull: String? = null
@@ -87,7 +87,7 @@ class WishRepository @Inject constructor(
             // well under that, but validate to give a clear error on edge cases.
             val estimatedBytes = imageSmall.length + imageFull.length + text.length
             if (estimatedBytes > 900_000) {
-                error("Image is too large to store. Try a lower-resolution photo.")
+                error("Фото слишком большое. Попробуйте выбрать фото с меньшим разрешением.")
             }
         }
 

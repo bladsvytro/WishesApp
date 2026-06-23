@@ -59,15 +59,15 @@ fun AddWishScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("New wish") },
+                title = { Text("Новое желание") },
                 navigationIcon = {
-                    IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, "Back") }
+                    IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, "Назад") }
                 },
                 actions = {
                     TextButton(
                         onClick = { viewModel.addWish(text, imageUri) },
                         enabled = (text.isNotBlank() || imageUri != null) && addState !is AddState.Loading,
-                    ) { Text("Post") }
+                    ) { Text("Добавить") }
                 },
             )
         }
@@ -80,11 +80,10 @@ fun AddWishScreen(
                 value = text,
                 onValueChange = { text = it },
                 modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text("Describe your wish...") },
+                placeholder = { Text("Опишите своё желание...") },
                 minLines = 4,
             )
 
-            // Image preview area
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -114,7 +113,7 @@ fun AddWishScreen(
                         },
                         modifier = Modifier.align(Alignment.TopEnd).padding(4.dp),
                     ) {
-                        Icon(Icons.Default.Close, "Remove image",
+                        Icon(Icons.Default.Close, "Убрать фото",
                             tint = MaterialTheme.colorScheme.onPrimary)
                     }
                 } else {
@@ -125,7 +124,7 @@ fun AddWishScreen(
                         Icon(Icons.Outlined.AddPhotoAlternate, null,
                             modifier = Modifier.size(40.dp),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Text("Add a photo", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text("Добавить фото", color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
             }

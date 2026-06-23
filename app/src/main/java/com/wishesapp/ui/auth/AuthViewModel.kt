@@ -54,7 +54,7 @@ class AuthViewModel @Inject constructor(
         if (!repo.isSignInLink(link)) return
         val email = prefs.getString(KEY_PENDING_EMAIL, null) ?: run {
             // Link arrived on a different device — no stored email.
-            _uiState.value = AuthUiState.Error("Please enter your email to complete sign-in on this device")
+            _uiState.value = AuthUiState.Error("Введите email для завершения входа на этом устройстве")
             return
         }
         completeSignIn(email, link)
@@ -69,7 +69,7 @@ class AuthViewModel @Inject constructor(
                 prefs.edit().putString(KEY_PENDING_EMAIL, email).apply()
                 _uiState.value = AuthUiState.LinkSent(email)
             } catch (e: Exception) {
-                _uiState.value = AuthUiState.Error(e.message ?: "Failed to send link")
+                _uiState.value = AuthUiState.Error(e.message ?: "Не удалось отправить ссылку")
             }
         }
     }
@@ -86,7 +86,7 @@ class AuthViewModel @Inject constructor(
                     _uiState.value = AuthUiState.SignedIn
                 },
                 onFailure = {
-                    _uiState.value = AuthUiState.Error(it.message ?: "Sign-in failed")
+                    _uiState.value = AuthUiState.Error(it.message ?: "Ошибка входа")
                 }
             )
         }

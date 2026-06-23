@@ -27,7 +27,7 @@ class UpdateViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            delay(3_000) // wait until app is settled before checking
+            delay(3_000)
             val info = checker.checkForUpdate()
             if (info?.isUpdateAvailable == true) {
                 _updateInfo.value = info
@@ -39,7 +39,6 @@ class UpdateViewModel @Inject constructor(
     fun dismiss() { _updateInfo.value = null }
 }
 
-/** A non-intrusive banner shown at the top of the wish list when an update is available. */
 @Composable
 fun UpdateBanner(viewModel: UpdateViewModel = hiltViewModel()) {
     val info by viewModel.updateInfo.collectAsState()
@@ -62,15 +61,15 @@ fun UpdateBanner(viewModel: UpdateViewModel = hiltViewModel()) {
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     Text(
-                        "Update ${update.latestVersionName} available",
+                        "Доступно обновление ${update.latestVersionName}",
                         style = MaterialTheme.typography.labelMedium,
                         modifier = Modifier.weight(1f),
                     )
                     TextButton(onClick = { viewModel.downloadUpdate(update.downloadUrl) }) {
-                        Text("Download")
+                        Text("Скачать")
                     }
                     TextButton(onClick = { viewModel.dismiss() }) {
-                        Text("Later")
+                        Text("Позже")
                     }
                 }
             }

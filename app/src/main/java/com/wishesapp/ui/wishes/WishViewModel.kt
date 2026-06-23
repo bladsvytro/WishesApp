@@ -83,7 +83,7 @@ class WishViewModel @Inject constructor(
                     _pendingImageBitmap.value = null
                     _addState.value = AddState.Success
                 },
-                onFailure = { _addState.value = AddState.Error(it.message ?: "Failed to add wish") }
+                onFailure = { _addState.value = AddState.Error(it.message ?: "Не удалось добавить желание") }
             )
         }
     }

@@ -38,7 +38,6 @@ fun WishDetailScreen(wish: Wish, onBack: () -> Unit) {
     var saveSuccess by remember { mutableStateOf<Boolean?>(null) }
     var savePending by remember { mutableStateOf(false) }
 
-    // Load full-resolution image with disk cache
     LaunchedEffect(wish.id) {
         wish.imageFull?.let { base64 ->
             withContext(Dispatchers.IO) {
@@ -47,7 +46,6 @@ fun WishDetailScreen(wish: Wish, onBack: () -> Unit) {
         }
     }
 
-    // Permission launcher for Android < 10 (WRITE_EXTERNAL_STORAGE needed to save to gallery)
     val writePermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { granted ->
@@ -76,7 +74,6 @@ fun WishDetailScreen(wish: Wish, onBack: () -> Unit) {
         }
     }
 
-    // Reset the snackbar-like saved indicator after a moment
     LaunchedEffect(saveSuccess) {
         if (saveSuccess != null) {
             kotlinx.coroutines.delay(2_500)
@@ -87,14 +84,14 @@ fun WishDetailScreen(wish: Wish, onBack: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Wish") },
+                title = { Text("Желание") },
                 navigationIcon = {
-                    IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, "Back") }
+                    IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, "Назад") }
                 },
                 actions = {
                     if (bitmap != null) {
                         IconButton(onClick = { triggerSave() }) {
-                            Icon(Icons.Default.Download, contentDescription = "Save to gallery")
+                            Icon(Icons.Default.Download, contentDescription = "Сохранить в галерею")
                         }
                     }
                 },
@@ -103,7 +100,7 @@ fun WishDetailScreen(wish: Wish, onBack: () -> Unit) {
         snackbarHost = {
             if (saveSuccess != null) {
                 Snackbar(modifier = Modifier.padding(16.dp)) {
-                    Text(if (saveSuccess == true) "Photo saved to gallery" else "Failed to save photo")
+                    Text(if (saveSuccess == true) "Фото сохранено в галерею" else "Не удалось сохранить фото")
                 }
             }
         },
@@ -120,7 +117,6 @@ fun WishDetailScreen(wish: Wish, onBack: () -> Unit) {
                     contentScale = ContentScale.Fit,
                 )
             } ?: run {
-                // Placeholder while loading
                 if (wish.imageFull != null) {
                     Box(
                         modifier = Modifier.fillMaxWidth().height(200.dp),
@@ -137,7 +133,7 @@ fun WishDetailScreen(wish: Wish, onBack: () -> Unit) {
                     Spacer(Modifier.height(8.dp))
                 }
                 Text(
-                    "by ${wish.authorName}",
+                    "от ${wish.authorName}",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.primary,
                 )

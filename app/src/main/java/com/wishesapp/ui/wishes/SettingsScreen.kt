@@ -34,7 +34,6 @@ fun SettingsScreen(
     var showLeaveSpaceDialog by remember { mutableStateOf(false) }
     var inviteCodeCopied by remember { mutableStateOf(false) }
 
-    // Navigate out once leave-space succeeds
     LaunchedEffect(leaveState) {
         if (leaveState is LeaveSpaceState.Success) {
             wishViewModel.onSpaceLeft()
@@ -46,17 +45,17 @@ fun SettingsScreen(
     if (showSignOutDialog) {
         AlertDialog(
             onDismissRequest = { showSignOutDialog = false },
-            title = { Text("Sign out?") },
-            text = { Text("You can sign back in with your email link. Your wishes stay safe in the cloud.") },
+            title = { Text("Выйти из аккаунта?") },
+            text = { Text("Вы сможете войти снова по ссылке на email. Желания останутся в облаке.") },
             confirmButton = {
                 TextButton(onClick = {
                     showSignOutDialog = false
                     wishViewModel.signOut()
                     onSignedOut()
-                }) { Text("Sign out") }
+                }) { Text("Выйти") }
             },
             dismissButton = {
-                TextButton(onClick = { showSignOutDialog = false }) { Text("Cancel") }
+                TextButton(onClick = { showSignOutDialog = false }) { Text("Отмена") }
             },
         )
     }
@@ -64,8 +63,8 @@ fun SettingsScreen(
     if (showLeaveSpaceDialog) {
         AlertDialog(
             onDismissRequest = { showLeaveSpaceDialog = false },
-            title = { Text("Leave this space?") },
-            text = { Text("Your wishes will stay in the cloud. You can create or join a new space afterwards.") },
+            title = { Text("Покинуть пространство?") },
+            text = { Text("Желания останутся в облаке. Вы сможете создать или вступить в новое пространство.") },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -73,10 +72,10 @@ fun SettingsScreen(
                         spaceViewModel.leaveSpace()
                     },
                     colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
-                ) { Text("Leave") }
+                ) { Text("Покинуть") }
             },
             dismissButton = {
-                TextButton(onClick = { showLeaveSpaceDialog = false }) { Text("Cancel") }
+                TextButton(onClick = { showLeaveSpaceDialog = false }) { Text("Отмена") }
             },
         )
     }
@@ -84,8 +83,8 @@ fun SettingsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Settings") },
-                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, "Back") } },
+                title = { Text("Настройки") },
+                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, "Назад") } },
             )
         }
     ) { padding ->
@@ -94,29 +93,27 @@ fun SettingsScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
 
-            // ── Space info ──────────────────────────────────────────────────
             mySpace?.let { space ->
                 val partnerName = space.members.entries
                     .firstOrNull { it.key != currentUserId }?.value
 
-                Text("Your space", style = MaterialTheme.typography.titleMedium)
+                Text("Ваше пространство", style = MaterialTheme.typography.titleMedium)
 
                 if (partnerName != null) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
-                        SuggestionChip(onClick = {}, label = { Text("You + $partnerName") })
+                        SuggestionChip(onClick = {}, label = { Text("Вы + $partnerName") })
                     }
                 } else {
                     Text(
-                        "Waiting for your partner to join",
+                        "Ожидаем партнёра",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
 
-                // Invite code card — useful to reshare
                 Card(
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.secondaryContainer,
@@ -128,7 +125,7 @@ fun SettingsScreen(
                     ) {
                         Column {
                             Text(
-                                "Invite code",
+                                "Код приглашения",
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSecondaryContainer,
                             )
@@ -144,7 +141,7 @@ fun SettingsScreen(
                         }) {
                             Icon(
                                 Icons.Default.ContentCopy,
-                                contentDescription = "Copy invite code",
+                                contentDescription = "Скопировать код",
                                 tint = if (inviteCodeCopied) MaterialTheme.colorScheme.primary
                                 else MaterialTheme.colorScheme.onSecondaryContainer,
                             )
@@ -155,10 +152,9 @@ fun SettingsScreen(
                 HorizontalDivider()
             }
 
-            // ── Widget mode ─────────────────────────────────────────────────
-            Text("Widget", style = MaterialTheme.typography.titleMedium)
+            Text("Виджет", style = MaterialTheme.typography.titleMedium)
             Text(
-                "Choose what the home-screen widget shows",
+                "Выберите, что показывать на виджете",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -167,15 +163,15 @@ fun SettingsScreen(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 WidgetModeButton(
-                    label = "Latest wish",
-                    description = "Updates instantly when your partner adds a new wish",
+                    label = "Последнее",
+                    description = "Обновляется сразу, когда партнёр добавляет желание",
                     selected = widgetState?.mode == WidgetMode.LATEST,
                     onClick = { wishViewModel.setWidgetMode(WidgetMode.LATEST) },
                     modifier = Modifier.weight(1f),
                 )
                 WidgetModeButton(
-                    label = "Random wish",
-                    description = "Rotates to a random wish every 30 minutes + tap to change",
+                    label = "Случайное",
+                    description = "Меняется каждые 30 минут + тап для смены",
                     selected = widgetState?.mode == WidgetMode.RANDOM,
                     onClick = { wishViewModel.setWidgetMode(WidgetMode.RANDOM) },
                     modifier = Modifier.weight(1f),
@@ -184,7 +180,6 @@ fun SettingsScreen(
 
             Spacer(Modifier.weight(1f))
 
-            // ── Leave space ─────────────────────────────────────────────────
             if (mySpace != null) {
                 OutlinedButton(
                     onClick = { showLeaveSpaceDialog = true },
@@ -200,7 +195,7 @@ fun SettingsScreen(
                             strokeWidth = 2.dp,
                         )
                     } else {
-                        Text("Leave space")
+                        Text("Покинуть пространство")
                     }
                 }
                 if (leaveState is LeaveSpaceState.Error) {
@@ -212,13 +207,12 @@ fun SettingsScreen(
                 }
             }
 
-            // ── Sign out ─────────────────────────────────────────────────────
             OutlinedButton(
                 onClick = { showSignOutDialog = true },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
             ) {
-                Text("Sign out")
+                Text("Выйти из аккаунта")
             }
         }
     }

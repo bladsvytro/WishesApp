@@ -51,7 +51,7 @@ class SpaceViewModel @Inject constructor(
                 val space = repo.createSpace(displayName)
                 _uiState.value = SpaceUiState.Success(space)
             } catch (e: Exception) {
-                _uiState.value = SpaceUiState.Error(e.message ?: "Failed to create space")
+                _uiState.value = SpaceUiState.Error(e.message ?: "Не удалось создать пространство")
             }
         }
     }
@@ -63,7 +63,7 @@ class SpaceViewModel @Inject constructor(
                 val space = repo.joinSpace(code, displayName)
                 _uiState.value = SpaceUiState.Success(space)
             } catch (e: Exception) {
-                _uiState.value = SpaceUiState.Error(e.message ?: "Failed to join space")
+                _uiState.value = SpaceUiState.Error(e.message ?: "Не удалось вступить в пространство")
             }
         }
     }
@@ -75,7 +75,7 @@ class SpaceViewModel @Inject constructor(
                 repo.leaveSpace()
                 _leaveState.value = LeaveSpaceState.Success
             } catch (e: Exception) {
-                _leaveState.value = LeaveSpaceState.Error(e.message ?: "Failed to leave space")
+                _leaveState.value = LeaveSpaceState.Error(e.message ?: "Не удалось покинуть пространство")
             }
         }
     }

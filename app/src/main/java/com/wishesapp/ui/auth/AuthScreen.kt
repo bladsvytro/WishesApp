@@ -47,12 +47,12 @@ private fun EmailInputContent(error: String?, onSend: (String) -> Unit) {
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Text(
-            text = "Wishes 🤍",
+            text = "Желания 🤍",
             style = MaterialTheme.typography.displaySmall,
             textAlign = TextAlign.Center,
         )
         Text(
-            text = "Enter your email to sign in",
+            text = "Введите email для входа",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -75,7 +75,7 @@ private fun EmailInputContent(error: String?, onSend: (String) -> Unit) {
             modifier = Modifier.fillMaxWidth(),
             enabled = email.isNotBlank(),
         ) {
-            Text("Send sign-in link")
+            Text("Отправить ссылку для входа")
         }
     }
 }
@@ -88,11 +88,11 @@ private fun LinkSentContent(email: String) {
     ) {
         Text("📧", style = MaterialTheme.typography.displaySmall)
         Text(
-            text = "Check your email",
+            text = "Проверьте почту",
             style = MaterialTheme.typography.headlineMedium,
         )
         Text(
-            text = "We sent a sign-in link to\n$email\n\nTap the link to open this app and sign in.",
+            text = "Мы отправили ссылку для входа на\n$email\n\nНажмите на ссылку, чтобы открыть приложение и войти.",
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.bodyMedium,
         )

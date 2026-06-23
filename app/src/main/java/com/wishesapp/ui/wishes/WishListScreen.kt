@@ -60,10 +60,10 @@ fun WishListScreen(
             TopAppBar(
                 title = {
                     Column {
-                        Text("Wishes 🤍")
+                        Text("Желания 🤍")
                         if (partnerName != null) {
                             Text(
-                                "with $partnerName",
+                                "с $partnerName",
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
@@ -72,21 +72,20 @@ fun WishListScreen(
                 },
                 actions = {
                     IconButton(onClick = onSettings) {
-                        Icon(Icons.Default.Settings, contentDescription = "Settings")
+                        Icon(Icons.Default.Settings, contentDescription = "Настройки")
                     }
                 },
             )
         },
         floatingActionButton = {
             FloatingActionButton(onClick = onAddWish) {
-                Icon(Icons.Default.Add, contentDescription = "Add wish")
+                Icon(Icons.Default.Add, contentDescription = "Добавить желание")
             }
         },
     ) { padding ->
         Column(modifier = Modifier.fillMaxSize().padding(padding)) {
             UpdateBanner()
 
-            // Invite code banner — shown until the partner joins
             AnimatedVisibility(
                 visible = waitingForPartner,
                 enter = expandVertically() + fadeIn(),
@@ -107,9 +106,9 @@ fun WishListScreen(
                             verticalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
                             Text("🌟", style = MaterialTheme.typography.displayMedium)
-                            Text("No wishes yet", style = MaterialTheme.typography.titleMedium)
+                            Text("Пока нет желаний", style = MaterialTheme.typography.titleMedium)
                             Text(
-                                "Tap + to add your first wish",
+                                "Нажмите + чтобы добавить первое желание",
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
@@ -149,12 +148,12 @@ private fun InviteCodeBanner(inviteCode: String) {
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    "Waiting for your partner",
+                    "Ожидаем партнёра",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSecondaryContainer,
                 )
                 Text(
-                    "Invite code: $inviteCode",
+                    "Код приглашения: $inviteCode",
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSecondaryContainer,
                 )
@@ -165,7 +164,7 @@ private fun InviteCodeBanner(inviteCode: String) {
             }) {
                 Icon(
                     Icons.Default.ContentCopy,
-                    contentDescription = "Copy invite code",
+                    contentDescription = "Скопировать код",
                     tint = if (copied) MaterialTheme.colorScheme.primary
                     else MaterialTheme.colorScheme.onSecondaryContainer,
                 )
@@ -184,7 +183,6 @@ fun WishCard(wish: Wish, onClick: () -> Unit) {
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
         Column {
-            // Use the thumbnail size for list cards; imageFull is used in the detail view.
             val thumbBase64 = wish.imageSmall ?: wish.imageFull
             thumbBase64?.let { base64 ->
                 val bitmap by produceState<Bitmap?>(null, wish.id) {
@@ -209,7 +207,7 @@ fun WishCard(wish: Wish, onClick: () -> Unit) {
                     Text(wish.text, style = MaterialTheme.typography.bodyLarge)
                 }
                 Text(
-                    "by ${wish.authorName}",
+                    "от ${wish.authorName}",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
