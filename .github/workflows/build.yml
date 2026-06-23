@@ -35,18 +35,7 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x gradlew
 
-      # Use real firebase config if secret is set, otherwise fall back to template
-      - name: Prepare google-services.json
-        env:
-          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
-        run: |
-          if [ -n "$GOOGLE_SERVICES_JSON" ]; then
-            echo "$GOOGLE_SERVICES_JSON" | base64 --decode > app/google-services.json
-            echo "Using Firebase config from secret"
-          else
-            cp google-services.json.template app/google-services.json
-            echo "No GOOGLE_SERVICES_JSON secret — using template (app will compile but Firebase won't work)"
-          fi
+      # google-services.json is committed to the repo (safe: it's embedded in the APK anyway)
 
       # Use release keystore if secret is set, otherwise generate a temporary one
       - name: Prepare release keystore

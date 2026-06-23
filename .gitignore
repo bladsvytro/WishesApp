@@ -10,7 +10,6 @@
 local.properties
 
 # Secrets — never commit these
-app/google-services.json
 app/release.keystore
 keystore.properties
 *.jks

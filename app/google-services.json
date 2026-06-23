@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "847142092247",
+    "project_id": "wishesapps-ba926",
+    "storage_bucket": "wishesapps-ba926.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:847142092247:android:44b8897d19c62151c9df92",
+        "android_client_info": {
+          "package_name": "com.wishesapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDLf43TH0c1m499yeqNIIJzGTxfnHbHAvY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
