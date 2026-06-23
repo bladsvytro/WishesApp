@@ -68,11 +68,11 @@ class WishWidget : GlanceAppWidget() {
                     contentScale = ContentScale.Crop,
                 )
             } else {
-                // Gradient-like fallback background
                 Box(
                     modifier = GlanceModifier
                         .fillMaxSize()
                         .background(ColorProvider(androidx.compose.ui.graphics.Color(0xFFD63865))),
+                    content = {},
                 )
             }
 
@@ -109,7 +109,7 @@ class WishWidget : GlanceAppWidget() {
                 if (state.mode == WidgetMode.RANDOM) {
                     Spacer(GlanceModifier.height(4.dp))
                     Text(
-                        text = "Tap to shuffle ↻",
+                        text = "Нажмите для смены ↻",
                         style = TextStyle(
                             color = ColorProvider(androidx.compose.ui.graphics.Color(0xAAFFFFFF)),
                             fontSize = 10.sp,
