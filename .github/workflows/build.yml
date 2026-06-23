@@ -48,7 +48,7 @@ jobs:
             echo "No GOOGLE_SERVICES_JSON secret — using template (app will compile but Firebase won't work)"
           fi
 
-      # Use release keystore if secret is set, otherwise let Gradle use debug key
+      # Use release keystore if secret is set, otherwise generate a temporary one
       - name: Prepare release keystore
         env:
           KEYSTORE_B64: ${{ secrets.KEYSTORE_B64 }}
@@ -63,7 +63,17 @@ jobs:
           EOF
             echo "Using release keystore from secret"
           else
-            echo "No KEYSTORE_B64 secret — APK will be signed with debug key"
+            keytool -genkeypair -v -keystore app/release.keystore \
+              -alias wishesapp -keyalg RSA -keysize 2048 -validity 365 \
+              -dname "CN=WishesApp, O=WishesApp, C=RU" \
+              -storepass android123 -keypass android123 2>/dev/null
+            cat > keystore.properties << EOF
+          storeFile=release.keystore
+          storePassword=android123
+          keyAlias=wishesapp
+          keyPassword=android123
+          EOF
+            echo "Generated temporary keystore (no KEYSTORE_B64 secret)"
           fi
 
       - name: Build release APK

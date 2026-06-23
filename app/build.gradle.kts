@@ -36,15 +36,6 @@ android {
                 storePassword = keystoreProps["storePassword"] as String
                 keyAlias = keystoreProps["keyAlias"] as String
                 keyPassword = keystoreProps["keyPassword"] as String
-            } else {
-                // No release keystore (e.g. CI without secrets) — fall back to debug key
-                val debugStore = File(System.getProperty("user.home"), ".android/debug.keystore")
-                if (debugStore.exists()) {
-                    storeFile = debugStore
-                    storePassword = "android"
-                    keyAlias = "androiddebugkey"
-                    keyPassword = "android"
-                }
             }
         }
     }
