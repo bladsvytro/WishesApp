@@ -3,15 +3,15 @@ name: Build & Release APK
 on:
   push:
     tags:
-      - 'v*'          # triggers on version tags like v1.0.0
-  workflow_dispatch:  # manual trigger from GitHub UI
+      - 'v*'
+  workflow_dispatch:
 
 permissions:
-  contents: write     # needed to create GitHub Releases and push version.json
+  contents: write
 
 jobs:
   build:
-    name: Build signed release APK
+    name: Build release APK
     runs-on: ubuntu-latest
 
     steps:
@@ -24,7 +24,6 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      # Install Gradle and generate the wrapper jar (not committed to repo)
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
@@ -36,24 +35,36 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x gradlew
 
-      - name: Decode google-services.json
+      # Use real firebase config if secret is set, otherwise fall back to template
+      - name: Prepare google-services.json
         env:
           GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
-        run: echo "$GOOGLE_SERVICES_JSON" | base64 --decode > app/google-services.json
+        run: |
+          if [ -n "$GOOGLE_SERVICES_JSON" ]; then
+            echo "$GOOGLE_SERVICES_JSON" | base64 --decode > app/google-services.json
+            echo "Using Firebase config from secret"
+          else
+            cp google-services.json.template app/google-services.json
+            echo "No GOOGLE_SERVICES_JSON secret — using template (app will compile but Firebase won't work)"
+          fi
 
-      - name: Decode release keystore
+      # Use release keystore if secret is set, otherwise let Gradle use debug key
+      - name: Prepare release keystore
         env:
           KEYSTORE_B64: ${{ secrets.KEYSTORE_B64 }}
-        run: echo "$KEYSTORE_B64" | base64 --decode > app/release.keystore
-
-      - name: Create keystore.properties
         run: |
-          cat > keystore.properties << EOF
+          if [ -n "$KEYSTORE_B64" ]; then
+            echo "$KEYSTORE_B64" | base64 --decode > app/release.keystore
+            cat > keystore.properties << EOF
           storeFile=release.keystore
           storePassword=${{ secrets.KEYSTORE_PASSWORD }}
           keyAlias=${{ secrets.KEY_ALIAS }}
           keyPassword=${{ secrets.KEY_PASSWORD }}
           EOF
+            echo "Using release keystore from secret"
+          else
+            echo "No KEYSTORE_B64 secret — APK will be signed with debug key"
+          fi
 
       - name: Build release APK
         run: ./gradlew :app:assembleRelease
@@ -75,11 +86,11 @@ jobs:
           tag_name: ${{ github.ref_name }}
           name: "Wishes ${{ steps.version.outputs.name }}"
           body: |
-            ## How to install
-            1. Download **WishesApp-${{ steps.version.outputs.name }}.apk** below
-            2. Open the file on your Android phone
-            3. If prompted, allow "Install unknown apps" for your browser/Files app
-            4. Tap Install
+            ## Как установить
+            1. Скачайте **WishesApp-${{ steps.version.outputs.name }}.apk** ниже
+            2. Откройте файл на Android-телефоне
+            3. Если появится запрос — разрешите установку из этого источника
+            4. Нажмите «Установить»
           files: app/build/outputs/apk/release/WishesApp-${{ steps.version.outputs.name }}.apk
           draft: false
           prerelease: false
