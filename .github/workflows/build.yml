@@ -1,0 +1,100 @@
+name: Build & Release APK
+
+on:
+  push:
+    tags:
+      - 'v*'          # triggers on version tags like v1.0.0
+  workflow_dispatch:  # manual trigger from GitHub UI
+
+permissions:
+  contents: write     # needed to create GitHub Releases and push version.json
+
+jobs:
+  build:
+    name: Build signed release APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      # Install Gradle and generate the wrapper jar (not committed to repo)
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Generate Gradle wrapper jar
+        run: gradle wrapper --gradle-version=8.9
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
+      - name: Decode google-services.json
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: echo "$GOOGLE_SERVICES_JSON" | base64 --decode > app/google-services.json
+
+      - name: Decode release keystore
+        env:
+          KEYSTORE_B64: ${{ secrets.KEYSTORE_B64 }}
+        run: echo "$KEYSTORE_B64" | base64 --decode > app/release.keystore
+
+      - name: Create keystore.properties
+        run: |
+          cat > keystore.properties << EOF
+          storeFile=release.keystore
+          storePassword=${{ secrets.KEYSTORE_PASSWORD }}
+          keyAlias=${{ secrets.KEY_ALIAS }}
+          keyPassword=${{ secrets.KEY_PASSWORD }}
+          EOF
+
+      - name: Build release APK
+        run: ./gradlew :app:assembleRelease
+
+      - name: Get version name
+        id: version
+        run: |
+          VERSION=$(grep 'versionName = ' app/build.gradle.kts | head -1 | sed 's/.*"\(.*\)".*/\1/')
+          echo "name=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Rename APK
+        run: |
+          mv app/build/outputs/apk/release/app-release.apk \
+             app/build/outputs/apk/release/WishesApp-${{ steps.version.outputs.name }}.apk
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: "Wishes ${{ steps.version.outputs.name }}"
+          body: |
+            ## How to install
+            1. Download **WishesApp-${{ steps.version.outputs.name }}.apk** below
+            2. Open the file on your Android phone
+            3. If prompted, allow "Install unknown apps" for your browser/Files app
+            4. Tap Install
+          files: app/build/outputs/apk/release/WishesApp-${{ steps.version.outputs.name }}.apk
+          draft: false
+          prerelease: false
+
+      - name: Update version.json on main branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          mkdir -p docs
+          cat > docs/version.json << EOF
+          {
+            "versionName": "${{ steps.version.outputs.name }}",
+            "downloadUrl": "https://github.com/${{ github.repository }}/releases/latest/download/WishesApp-${{ steps.version.outputs.name }}.apk"
+          }
+          EOF
+          git add docs/version.json
+          git diff --staged --quiet || git commit -m "chore: bump version.json to ${{ steps.version.outputs.name }}"
+          git push origin HEAD:main

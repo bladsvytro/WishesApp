@@ -1,0 +1,76 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── helpers ──────────────────────────────────────────────────────────────
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // members is a Map field on the space document (not a subcollection)
+    function isSpaceMember(spaceId) {
+      return isSignedIn() &&
+        get(/databases/$(database)/documents/spaces/$(spaceId))
+          .data.members[request.auth.uid] != null;
+    }
+
+    // ── users ─────────────────────────────────────────────────────────────────
+    match /users/{uid} {
+      // Any signed-in user can read another user's profile (needed to load partner name / FCM token)
+      allow read: if isSignedIn();
+      allow create: if request.auth.uid == uid;
+      // User can only update their own profile
+      allow update: if request.auth.uid == uid;
+    }
+
+    // ── spaces ────────────────────────────────────────────────────────────────
+    match /spaces/{spaceId} {
+      // Any signed-in user can read a space document (needed to look up by invite code)
+      allow read: if isSignedIn();
+
+      // Only the creator can create
+      allow create: if isSignedIn() &&
+        request.resource.data.createdBy == request.auth.uid;
+
+      // Members can update — specifically:
+      //   • an existing member updating shared fields
+      //   • a new user adding themselves to the members map (joining via invite code)
+      allow update: if isSignedIn() && (
+        isSpaceMember(spaceId) ||
+        // Joining: only the members map changes, and only the caller's uid is added
+        (
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['members']) &&
+          request.resource.data.members.keys().hasOnly(
+            resource.data.members.keys().concat([request.auth.uid])
+          ) &&
+          resource.data.members.size() < 2
+        )
+      );
+
+      // ── wishes ──────────────────────────────────────────────────────────────
+      match /wishes/{wishId} {
+        allow read: if isSpaceMember(spaceId);
+
+        allow create: if isSpaceMember(spaceId) &&
+          request.resource.data.authorId == request.auth.uid;
+
+        // Only the author can delete their own wish
+        allow delete: if isSignedIn() &&
+          resource.data.authorId == request.auth.uid;
+
+        // Any space member can mark a wish as seen (update only seenBy field)
+        allow update: if isSpaceMember(spaceId) &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['seenBy']);
+      }
+    }
+
+    // ── notifications (FCM delivery queue, future Cloud Function hook) ────────
+    match /notifications/{notifId} {
+      // Any signed-in space member can create a notification for their partner
+      allow create: if isSignedIn();
+      // Only the recipient can read or delete their own notification
+      allow read, delete: if isSignedIn() &&
+        resource.data.to == request.auth.uid;
+    }
+  }
+}

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wishes App</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: linear-gradient(135deg, #FCE4EC 0%, #F8BBD9 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .card {
+      background: white;
+      border-radius: 24px;
+      padding: 48px 40px;
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 8px 40px rgba(214,56,101,0.15);
+    }
+    .heart { font-size: 64px; margin-bottom: 16px; }
+    h1 { font-size: 2rem; color: #D63865; margin-bottom: 8px; }
+    .subtitle { color: #888; font-size: 1rem; margin-bottom: 32px; line-height: 1.5; }
+    .btn {
+      display: inline-block;
+      background: #D63865;
+      color: white;
+      padding: 16px 40px;
+      border-radius: 50px;
+      text-decoration: none;
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(214,56,101,0.35); }
+    .version { color: #bbb; font-size: 0.8rem; margin-top: 8px; }
+    .steps { text-align: left; margin-top: 32px; }
+    .steps h2 { font-size: 1rem; color: #555; margin-bottom: 12px; }
+    .step { display: flex; gap: 12px; margin-bottom: 10px; align-items: flex-start; }
+    .step-num {
+      background: #FCE4EC;
+      color: #D63865;
+      border-radius: 50%;
+      min-width: 28px; height: 28px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 0.85rem;
+    }
+    .step-text { color: #555; font-size: 0.9rem; line-height: 1.5; padding-top: 3px; }
+    .note { margin-top: 16px; padding: 12px 16px; background: #FFF8F9; border-radius: 12px;
+            color: #999; font-size: 0.8rem; border: 1px solid #FCE4EC; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="heart">🤍</div>
+    <h1>Wishes</h1>
+    <p class="subtitle">Share wishes and dreams with your person.<br>Photos, text, and a home-screen widget.</p>
+
+    <a class="btn" id="download-btn" href="#" onclick="downloadAPK(event)">
+      ⬇ Download for Android
+    </a>
+    <div class="version" id="version-text">Loading version…</div>
+
+    <div class="steps">
+      <h2>How to install</h2>
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-text">Tap the button above to download the APK file.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-text">Open the downloaded file. Your browser may ask permission — tap <strong>Open</strong>.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-text">Android will ask to <strong>Allow install from this source</strong> — tap Allow.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-text">Tap <strong>Install</strong>, then open the app.</div>
+      </div>
+      <div class="note">
+        You may see a Play Protect warning — this is normal for apps outside the Play Store.
+        Tap <em>More details → Install anyway</em>.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function loadVersion() {
+      try {
+        const res = await fetch('version.json?t=' + Date.now());
+        const data = await res.json();
+        document.getElementById('version-text').textContent = 'Version ' + data.versionName;
+        document.getElementById('download-btn').href = data.downloadUrl;
+      } catch (e) {
+        document.getElementById('version-text').textContent = 'See Releases page for the latest version';
+        document.getElementById('download-btn').href =
+          'https://github.com/YOUR_USERNAME/WishesApp/releases/latest';
+      }
+    }
+    function downloadAPK(e) {
+      // href is already set by loadVersion; nothing special needed
+    }
+    loadVersion();
+  </script>
+</body>
+</html>
